@@ -1,55 +1,39 @@
 import java.util.Scanner;
 import java.util.Stack;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 
 public class App {
     public static Stack <Object> pila = new Stack<>();
         public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);    
-        int semilla, a, c, m, operacion;
-        System.out.println("1 para el Congruencial Mixto, 2 para el Congruencial Multiplicativo");
-        operacion = sc.nextInt();
-        System.out.println("Introduzca la semilla!");
-        semilla = sc.nextInt();
-        System.out.println("Introduzca a");
-        a = sc.nextInt();
-        System.out.println("Introduzca m");
-        m = sc.nextInt();
-        switch(operacion){
-            case 1:
-            System.out.println("Introduzca c");
-            c = sc.nextInt();
-            mixto(semilla, a, c, m);
-                break;
-            case 2:
-            multiplicativo(semilla, a, m);
-                break;
+        int semilla, m;
+        semilla=94;
+        m=100;
+
+        for( int a= 1; a <=100; a++ ){
+            for( int c = 1; c <=100; c++){
+                mixto(semilla, a, c, m);
+            }
         }
-        //System.out.println("Introduzca la semilla!");
-        //semilla = sc.nextInt();
-        //System.out.println("Introduzca a");
-        //a = sc.nextInt();
-        //System.out.println("Introduzca b");
-        //c = sc.nextInt();
-        //System.out.println("Introduzca m");
-        //m = sc.nextInt();
-//
-        //mixto(semilla, a, c, m);
-        //multiplicativo(semilla, a, m);
+
     }
-        //Mixto:(a*Xi+c)
+        
     public static void mixto(int semilla, int a, int c, int m){
+        pila.clear();
         float numAleatorio; 
         float xi=semilla;
         boolean repetido=false;
         while(repetido!=true){
             xi = ((a*xi)+c) % m;
-            System.out.println(xi); 
             repetido=repetidos(xi);
             numAleatorio=xi/m;
-            System.out.println("Número Aleatorio = " + numAleatorio);  
         }
         if (pila.size()==m){
-            System.out.println("Periodo de" + m);
+            
+            txt(semilla, a, c , m);
+            System.out.println("Periodo de " + m);
         }
         else{
             System.out.println("Periodo incompleto");
@@ -90,4 +74,43 @@ public class App {
         
         return true;
     }
+
+    //Genera archivos txt
+public static int contador=0;
+
+    public static void txt (int semilla, int a, int c, int m){
+        BufferedWriter bw = null;
+        FileWriter fw = null;
+    
+        try {
+            contador++;
+            String data = contador+".- "+semilla+", " +a+", "+c+", "+m+ "\n";
+            File file = new File("C:/Users/2RJ27LA_RS5/Documents/Parámetros/100secuencias.txt");
+            // Si el archivo no existe, se crea!
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            // flag true, indica adjuntar información al archivo.
+            fw = new FileWriter(file.getAbsoluteFile(), true);
+            bw = new BufferedWriter(fw);
+            bw.newLine();
+            bw.write(data);
+            System.out.println("información agregada!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                           
+                if (bw != null)
+                    bw.close();
+                if (fw != null)
+                    fw.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+            
+        
+    }
+
 }
