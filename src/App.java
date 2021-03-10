@@ -1,6 +1,6 @@
 import java.util.Scanner;
 import java.util.Stack;
-
+import java.util.Map;
 import javax.print.event.PrintEvent;
 
 import java.io.BufferedWriter;
@@ -8,11 +8,14 @@ import java.io.File;
 import java.io.FileWriter;
 
 public class App {
+    public static int muestra=20;
     public static Stack <Float> pila = new Stack<Float>();
     public static Stack <Float> pilaAleatorios = new Stack<Float>();
+    public static Float[] numerosMuestra = new Float[muestra];
         public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);    
         int semilla, m, a ,c;
+        
         semilla=8;
         m=32;
         a=9;
@@ -58,21 +61,60 @@ public class App {
         int n= pilaAleatorios.size();
         float sqrtN = (float) Math.sqrt(n);
         float prom_esperado=(float)0.5;
+        int i = 0;
         while(!pilaAleatorios.empty()){
+            if(i < muestra){
+                
+                numerosMuestra[i] = pilaAleatorios.peek();
+                i++;
+                
+            }
             suma=suma+pilaAleatorios.pop();
         }
         float prom_observado=suma/n;
-        System.out.println(prom_observado);
-        System.out.println(suma);
-        System.out.println(sqrtN);
         float Z0 = ((prom_observado - prom_esperado ) * sqrtN)/varianza;
-        System.out.println(Z0);
         if(Z0<ZA){
             //Guardar la combinación de números
-           System.out.println("No se rechaza");
+           pruebaFrecuencias();
+        }
+    }
+
+    public static void pruebaFrecuencias(){
+        float num_intervalos=4;
+        float rango=1/num_intervalos;
+        float FE=muestra/num_intervalos;
+        int valores_intervalos[]= new int[(int)num_intervalos];
+        for(int i=0;i<num_intervalos;i++){
+           for(int j=0;j<numerosMuestra.length;j++){
+               float limite_inferior=rango*i;
+               float limite_superior=rango*(i+1);
+               float num_evaluado=numerosMuestra[j];
+               if(num_evaluado>limite_inferior && num_evaluado<limite_superior){
+                   valores_intervalos[i]+= 1;
+               }
+           }
+        }
+        for (int i=0;i<valores_intervalos.length;i++){
+            System.out.println(valores_intervalos[i]);
+        }
+        pruebaFrecuenciasEvaluacion(valores_intervalos,FE);
+    }
+
+    public static void pruebaFrecuenciasEvaluacion(int[] sumaIntervalos, float FE){
+        float suma=0;
+        for(int i=0; i<sumaIntervalos.length;i++){
+            float diferencia= FE-sumaIntervalos[i];
+            suma+=Math.pow(diferencia, 2);
+        }
+        System.out.println(suma);
+        float x02= suma/muestra;
+        System.out.println(x02);
+        if(x02<7.81){
+            System.out.println("Se aprueba");
         }else{
             System.out.println("Se rechaza");
         }
+
     }
 
 
@@ -145,7 +187,7 @@ public static int contador=0;
                 ex.printStackTrace();
             }
         }
-            
+
         
     }
 
