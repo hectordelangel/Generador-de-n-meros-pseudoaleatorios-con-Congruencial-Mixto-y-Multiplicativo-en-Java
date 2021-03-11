@@ -95,7 +95,6 @@ public class App {
            }
         }
         for (int i=0;i<valores_intervalos.length;i++){
-            System.out.println(valores_intervalos[i]);
         }
         pruebaFrecuenciasEvaluacion(valores_intervalos,FE);
     }
@@ -106,15 +105,50 @@ public class App {
             float diferencia= FE-sumaIntervalos[i];
             suma+=Math.pow(diferencia, 2);
         }
-        System.out.println(suma);
         float x02= suma/muestra;
-        System.out.println(x02);
         if(x02<7.81){
-            System.out.println("Se aprueba");
+            pruebaSeries();
         }else{
             System.out.println("Se rechaza");
         }
+    }
 
+    public static void pruebaSeries(){
+        float n=2;
+        float FE=(float) ((muestra-1)/(Math.pow(n, 2)));
+        float num_celdas=4;
+        int celdas_pares[]= new int[(int)num_celdas];
+
+        for(int j=0; j<(numerosMuestra.length-1);j++){
+            if(numerosMuestra[j]<0.5 && numerosMuestra[(j+1)]<0.5){
+                celdas_pares[0]+=1;
+            }
+            else if(numerosMuestra[j]>0.5 && numerosMuestra[(j+1)]<0.5){
+                celdas_pares[1]+=1;
+            }
+            else if(numerosMuestra[j]<0.5 && numerosMuestra[(j+1)]>0.5){
+                celdas_pares[2]+=1;
+            }
+            else if(numerosMuestra[j]>0.5 && numerosMuestra[(j+1)]>0.5){
+                celdas_pares[3]+=1;
+            }
+        }
+        pruebaSeriesEvaluacion(celdas_pares, FE);
+    }
+
+    public static void pruebaSeriesEvaluacion(int[] sumaCeldaPares, float FE){
+        float suma=0;
+        for(int i=0; i<sumaCeldaPares.length;i++){
+            float diferencia= sumaCeldaPares[i]-FE;
+            suma+=Math.pow(diferencia, 2);
+        }
+        float x02= suma/FE;
+        System.out.println(x02);
+        if(x02<7.81){
+            System.out.println("No se rechaza");
+        }else{
+            System.out.println("Se rechaza");
+        }
     }
 
 
