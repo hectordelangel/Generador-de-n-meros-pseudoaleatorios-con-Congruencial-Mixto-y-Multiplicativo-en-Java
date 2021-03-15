@@ -143,12 +143,118 @@ public class App {
             suma+=Math.pow(diferencia, 2);
         }
         float x02= suma/FE;
-        System.out.println(x02);
         if(x02<7.81){
-            System.out.println("No se rechaza");
+            pruebaPoker();
         }else{
             System.out.println("Se rechaza");
         }
+    }
+
+    public static void pruebaPoker(){
+        String [] digitos= new String[muestra];
+        //arreglo con jugadas de poker
+        // 0 - quintilla 
+        //-1 poker 
+        //2- full 
+        //3- tercia 
+        //4- dos pares 
+        //5-par 
+        //6-diferentes
+        int [] poker = new int [7];
+
+        for (int i=0;i<numerosMuestra.length;i++){
+            String numeroCadena = Float.toString(numerosMuestra[i]);
+            String [] parts = numeroCadena.split("\\.");    
+    
+            if(parts[1].length()<5){
+                for (int j=parts[1].length();j<5;j++){
+                    parts[1]+="0";
+                }
+            }
+            digitos[i]=parts[1].substring(0, 5);
+        }
+        
+        for(int i=0; i<digitos.length;i++){
+            String numeroEvaluado=digitos[i];
+            int [] conteoIndividual = new int [10];
+            for(int j=0;j<numeroEvaluado.length();j++){
+                int num=Character.getNumericValue(numeroEvaluado.charAt(j));
+                conteoIndividual[num]+=1;
+            }
+            int contadorTercia = 0, contadorDosPares = 0, diferente = 0;
+            for(int j = 0; j < conteoIndividual.length; j++ ){
+                //Quintilla
+                 if(conteoIndividual[j] == 5){
+                    poker[0] += 1;
+                }
+                //Poker
+                else if(conteoIndividual[j] == 4)
+                {
+                    poker[1] += 1;
+                }
+
+                else if(conteoIndividual[j] == 2){
+                    contadorDosPares++;
+                    //Dos pares
+                    if(contadorDosPares == 2){
+                        poker[4] += 1;
+                        poker[5] -= 1;
+                        
+                    }
+                    //Par
+                    else if(contadorDosPares == 1){
+                        poker[5] += 1;
+                    }
+                }
+                else if(conteoIndividual[j] == 3){
+                    contadorTercia++;
+                    //Full
+                    if(contadorTercia == 1 && contadorDosPares == 1){
+                        poker[2] += 1;
+                        poker[3] -= 1;
+                        poker[5] -= 1;
+                    }
+                    //Tercia
+                    else if(contadorTercia == 1){
+                        poker[3] += 1;
+                    }
+                }
+                if(conteoIndividual[j] <= 1 ){
+                    diferente++;
+                    if(diferente == 10){
+                        poker[6] += 1;
+                    }
+
+                }
+            }
+        }
+        //muestra = 20;
+        
+        double [] p = {0.0001,0.0045,0.009,0.072,0.108,0.504,0.3024};
+        double [] valoresChiCuadrada = {3.841,5.991,7.815,9.488,11.070,12.592,14.067, 15.507,16.919,18.307};
+        double m = muestra, chiCuadrada = 0;
+        int i;
+        int numAcumulado=0;
+        double FOacumulado = poker[0], FEacumulado =  p[0]* m;
+        for(i = 1; i < poker.length; i++){
+            if((FOacumulado + poker[i]) < 5){
+                FOacumulado += poker[i];
+                FEacumulado += p[i] * muestra;
+            }
+            else{
+                numAcumulado = (poker.length - (i-1))+1;
+                chiCuadrada += (Math.pow((p[i]*m)-poker[i], 2))/(p[i]*m);
+            }
+
+        }
+        chiCuadrada += (Math.pow((FEacumulado-FOacumulado), 2))/FEacumulado;
+        if( chiCuadrada < valoresChiCuadrada[numAcumulado-2]){
+            System.out.println(chiCuadrada);
+            System.out.println("No se rechaza");
+        }
+        else{
+            System.out.println("Se rechaza");
+        }   
     }
 
 
