@@ -1,8 +1,11 @@
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.Arrays;
 import java.util.Map;
 import javax.print.event.PrintEvent;
-
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -12,20 +15,54 @@ public class App {
     public static Stack <Float> pila = new Stack<Float>();
     public static Stack <Float> pilaAleatorios = new Stack<Float>();
     public static Float[] numerosMuestra = new Float[muestra];
+    public static Float[] aleatorios;
+    public static int incrementar = 0;
+    public static int limiteA,limiteB;
+    public static boolean pasa = false;
         public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);    
         int semilla, m, a ,c;
         
-        semilla=8;
+        // System.out.println("");
+        // limiteA=sc.nextInt();
+        // System.out.println("");
+        // limiteB =sc.nextInt();
+        limiteA=1;
+        limiteB=-1;
+        semilla=94;
         m=32;
-        a=9;
-        c=13;
-        mixto(semilla, a, c, m);
-        // for( int a= 1; a <=100; a++ ){
-        //     for( int c = 1; c <=100; c++){
-        //         mixto(semilla, a, c, m);
-        //     }
-        // }
+        float n=1000;
+        int contadorMonteCarlo=0;
+        int dentro=0;
+        // a=9;
+        // c=13;
+        // mixto(semilla, a, c, m);
+        outerloop:   
+        for(a= 1; a <=100; a++ ){
+            for(c = 1; c <=100; c++){
+                    //Hacemos que se ejecute lo que tenemos en main (lo pasamos a una función)
+                    mixto(semilla, a, c, m);
+                if (pasa){   
+                    // txt(semilla, a, c , m);
+                    while(incrementar<m){
+                        System.out.println("Montecarlo: "+contadorMonteCarlo);
+                        dentro+=monteCarlo();
+                        contadorMonteCarlo++;
+                        incrementar++;
+                        if(contadorMonteCarlo==n){
+                            break outerloop;
+                        }
+                    }
+                    pasa=false;
+                }
+                incrementar = 0;
+            }
+        }
+        // leerTxt();
+        System.out.println("dentro: "+dentro);
+        float pi=(dentro/n)*4;
+        System.out.println("Pi: "+pi);
+
 
     }
         
@@ -41,14 +78,10 @@ public class App {
             repetido=repetidos(xi, numAleatorio);
         }
         if (pila.size()==m){
-            
-            txt(semilla, a, c , m);
-            System.out.println("Periodo de " + m);
             pruebaPromedio();
-
         }
         else{
-            System.out.println("Periodo incompleto");
+            pasa=false;
         }
               
     }
@@ -62,14 +95,14 @@ public class App {
         float sqrtN = (float) Math.sqrt(n);
         float prom_esperado=(float)0.5;
         int i = 0;
+        aleatorios=new Float[pilaAleatorios.size()];
         while(!pilaAleatorios.empty()){
             if(i < muestra){
-                
                 numerosMuestra[i] = pilaAleatorios.peek();
-                i++;
-                
             }
+            aleatorios[i]=pilaAleatorios.peek();
             suma=suma+pilaAleatorios.pop();
+            i++;
         }
         float prom_observado=suma/n;
         float Z0 = ((prom_observado - prom_esperado ) * sqrtN)/varianza;
@@ -109,7 +142,7 @@ public class App {
         if(x02<7.81){
             pruebaSeries();
         }else{
-            System.out.println("Se rechaza");
+            pasa = false;
         }
     }
 
@@ -146,7 +179,8 @@ public class App {
         if(x02<7.81){
             pruebaPoker();
         }else{
-            System.out.println("Se rechaza");
+            pasa = false;
+            System.out.println("no pasa poker");
         }
     }
 
@@ -249,14 +283,45 @@ public class App {
         }
         chiCuadrada += (Math.pow((FEacumulado-FOacumulado), 2))/FEacumulado;
         if( chiCuadrada < valoresChiCuadrada[numAcumulado-2]){
-            System.out.println(chiCuadrada);
-            System.out.println("No se rechaza");
+            pasa = true;
         }
         else{
-            System.out.println("Se rechaza");
+            pasa = false;
         }   
     }
 
+    public static float Uniforme(int a, int b){
+        float x=a+(b-a)*aleatorios[incrementar];
+        
+        // while(){
+        //     while(){
+                
+        //     }
+        // }
+        // for (;incrementar<x.length;){
+        //     //x = a+(b-a)*aleatorios[incrementar];
+        //     x[incrementar]=a+(b-a)*aleatorios[incrementar];
+        return x;
+        
+    }
+
+    public static int monteCarlo(){
+        int dentro = 0;
+        float x=0;
+        float y=0;
+        float dardo=0;
+        x=Uniforme(limiteA, limiteB);
+        System.out.println("x: "+x);
+        y=Uniforme(limiteA, limiteB);
+        System.out.println("y: "+y);
+        dardo=(float)Math.sqrt(Math.pow(x, 2)+Math.pow(y, 2));
+        System.out.println("dardo "+dardo);
+        if( dardo < 1){
+            dentro++;
+        }
+        return dentro;
+        //(detro/n)*4
+    }
 
     public static void multiplicativo(int semilla, int a, int m){
         float numAleatorio;
@@ -302,8 +367,8 @@ public static int contador=0;
     
         try {
             contador++;
-            String data = contador+".- "+semilla+", " +a+", "+c+", "+m+ "\n";
-            File file = new File("C:/Users/2RJ27LA_RS5/Documents/Parámetros/100secuencias.txt");
+            String data =semilla+","+a+","+c+","+m;
+            File file = new File("100secuencias.txt");
             // Si el archivo no existe, se crea!
             if (!file.exists()) {
                 file.createNewFile();
@@ -329,6 +394,48 @@ public static int contador=0;
         }
 
         
+    }
+
+    public static void leerTxt(){
+        String nombreFichero = "100secuencias.txt";
+        //Declarar una variable BufferedReader
+        BufferedReader br = null;
+        try {
+           //Crear un objeto BufferedReader al que se le pasa 
+           //   un objeto FileReader con el nombre del fichero
+           br = new BufferedReader(new FileReader(nombreFichero));
+           //Leer la primera línea, guardando en un String
+           String texto = br.readLine();
+           //Repetir mientras no se llegue al final del fichero
+           
+           System.out.println(texto);
+           while(texto != null)
+           {
+               String [] parts= texto.split(",");   
+               //Hacer lo que sea con la línea leída
+               System.out.println(parts[0]);
+               //Leer la siguiente línea
+               texto = br.readLine();
+           }
+        }
+        catch (FileNotFoundException e) {
+            System.out.println("Error: Fichero no encontrado");
+            System.out.println(e.getMessage());
+        }
+        catch(Exception e) {
+            System.out.println("Error de lectura del fichero");
+            System.out.println(e.getMessage());
+        }
+        finally {
+            try {
+                if(br != null)
+                    br.close();
+            }
+            catch (Exception e) {
+                System.out.println("Error al cerrar el fichero");
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
 }
