@@ -48,7 +48,6 @@ public class App {
                         System.out.println("Montecarlo: "+contadorMonteCarlo);
                         dentro+=monteCarlo();
                         contadorMonteCarlo++;
-                        incrementar++;
                         if(contadorMonteCarlo==n){
                             break outerloop;
                         }
@@ -292,6 +291,7 @@ public class App {
 
     public static float Uniforme(int a, int b){
         float x=a+(b-a)*aleatorios[incrementar];
+        incrementar++;
         
         // while(){
         //     while(){
