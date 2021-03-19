@@ -1,8 +1,5 @@
 import java.util.Scanner;
 import java.util.Stack;
-import java.util.Arrays;
-import java.util.Map;
-import javax.print.event.PrintEvent;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -22,24 +19,39 @@ public class App {
         public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);    
         int semilla, m, a ,c;
-        
-        // System.out.println("");
-        // limiteA=sc.nextInt();
-        // System.out.println("");
-        // limiteB =sc.nextInt();
+        int lambda=3;
         limiteA=1;
         limiteB=-1;
         semilla=94;
         m=32;
+        float exito=(float)0.7;
+        
+        System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 0 para salir");
+        int montecarloOtro=sc.nextInt();
+        while(montecarloOtro != 0){
+            switch (montecarloOtro){
+                case 1:
+                    monteCarloRecorrido(semilla, m);
+                    break;
+                case 2:
+                    recorridoExponencial(semilla, m, lambda);
+                    break;
+                case 3: 
+                    recorridoBernoulli(semilla, m, exito);
+                    break;
+            }
+            System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 0 para salir");
+            montecarloOtro=sc.nextInt();
+        }        
+    }
+
+    public static void monteCarloRecorrido(int semilla, int m){
         float n=1000;
         int contadorMonteCarlo=0;
         int dentro=0;
-        // a=9;
-        // c=13;
-        // mixto(semilla, a, c, m);
-        outerloop:   
-        for(a= 1; a <=100; a++ ){
-            for(c = 1; c <=100; c++){
+        outerloop:
+        for(int a= 1; a <=100; a++ ){
+            for(int c = 1; c <=100; c++){
                     //Hacemos que se ejecute lo que tenemos en main (lo pasamos a una función)
                     mixto(semilla, a, c, m);
                 if (pasa){   
@@ -57,11 +69,55 @@ public class App {
                 incrementar = 0;
             }
         }
-        // leerTxt();
         System.out.println("dentro: "+dentro);
         float pi=(dentro/n)*4;
         System.out.println("Pi: "+pi);
+    }
 
+    public static void recorridoExponencial(int semilla, int m, float lambda){
+        int numero=1;
+        Scanner sc = new Scanner(System.in);   
+        outerloop: 
+        for(int a= 1; a <=100; a++ ){
+            for(int c = 1; c <=100; c++){
+                mixto(semilla, a, c, m);
+                if (pasa){        
+                    while(incrementar<m && numero==1){
+                        System.out.println("1 para darle un número 0 para salir");
+                        numero=sc.nextInt();
+                        exponencial(lambda);
+                        if (numero==0){
+                            break outerloop;
+                        }
+                    }
+                    pasa=false;
+                }
+                incrementar = 0;
+            }
+        }
+    }
+    
+    public static void recorridoBernoulli(int semilla, int m, float exito){
+        int numero=1;
+        Scanner sc = new Scanner(System.in);   
+        outerloop: 
+        for(int a = 1; a <= 100; a++){
+            for(int c = 1; c<=100; c++){
+                mixto(semilla, a, c, m);
+                if(pasa){
+                    while(incrementar < m && numero == 1){
+                        System.out.println("1 para darle un número 0 para salir");
+                        numero=sc.nextInt();
+                        bernoulli(exito);
+                        if (numero==0){
+                            break outerloop;
+                        }
+                    }
+                }
+                pasa = false;
+            }
+            incrementar = 0;
+        }
 
     }
         
@@ -179,7 +235,6 @@ public class App {
             pruebaPoker();
         }else{
             pasa = false;
-            System.out.println("no pasa poker");
         }
     }
 
@@ -321,6 +376,26 @@ public class App {
         }
         return dentro;
         //(detro/n)*4
+    }
+
+    public static void exponencial(float lamda){
+        double xi;
+        xi = -lamda * Math.log(1 - (double) aleatorios[incrementar]);
+        incrementar++;
+        System.out.println(xi);
+    }
+    //incrementarE = 0, incrementarB = 0
+    public static void bernoulli(float exito){
+        String cadena;
+        cadena = String.valueOf(aleatorios[incrementar]);
+        //Falta aumentar incrementar
+        if(aleatorios[incrementar] < exito){
+            cadena += " No se rechaza";
+        }
+        else
+            cadena += " Se rechaza";
+        incrementar++;
+        System.out.println(cadena);
     }
 
     public static void multiplicativo(int semilla, int a, int m){
