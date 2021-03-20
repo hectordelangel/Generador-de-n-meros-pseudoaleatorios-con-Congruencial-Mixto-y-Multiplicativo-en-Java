@@ -19,13 +19,13 @@ public class App {
         public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);    
         int semilla, m, a ,c;
-        int lambda=5;
+        int lambda=8;
         limiteA=1;
         limiteB=-1;
         semilla=94;
         m=32;
         float exito=(float)0.7;
-        System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 4 para Poisson 0 para salir");
+        System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 4 para Poisson 5 para Erlang 0 para salir");
         int montecarloOtro=sc.nextInt();
         while(montecarloOtro != 0){
             switch (montecarloOtro){
@@ -41,10 +41,41 @@ public class App {
                 case 4: 
                     recorridoPoisson(lambda, semilla, m);
                     break;
+                case 5: 
+                    erlang(lambda, semilla, m);
+                    break;
             }
-            System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 4 para Poisson 0 para salir");
+            System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 4 para Poisson 5 para Erlang 0 para salir");
             montecarloOtro=sc.nextInt();
         }        
+    }
+
+    public static void recorridoErlang(float lambda){
+        float k = aleatorios.length;
+        float ri=1;
+        for(int i=0;i<k;i++){
+            ri*=(1-aleatorios[i]);
+        }
+        float log=(float)Math.log(ri);
+        System.out.println(log);
+        float erlang=(float) ((-lambda/k)* log);
+        System.out.println(erlang);
+    }
+
+    public static void erlang(int lambda, int semilla, int m){
+        outerloop:
+        for(int a= 1; a <=100; a++ ){
+            for(int c = 1; c <=100; c++){
+                    //Hacemos que se ejecute lo que tenemos en main (lo pasamos a una función)
+                    mixto(semilla, a, c, m);
+                    if (pasa){   
+                    recorridoErlang(lambda);
+                    pasa=false;
+                    break outerloop;
+                }
+                incrementar = 0;
+            }
+        }
     }
 
     public static void recorridoPoisson(int lamda, int semilla, int m){
@@ -83,6 +114,8 @@ public class App {
             return 1;
         return numero * factorial(numero - 1);
     }
+
+
 
     public static void monteCarloRecorrido(int semilla, int m){
         float n=1000;
