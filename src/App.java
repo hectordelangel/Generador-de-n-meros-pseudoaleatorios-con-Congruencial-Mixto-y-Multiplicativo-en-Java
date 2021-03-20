@@ -19,14 +19,13 @@ public class App {
         public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);    
         int semilla, m, a ,c;
-        int lambda=3;
+        int lambda=5;
         limiteA=1;
         limiteB=-1;
         semilla=94;
         m=32;
         float exito=(float)0.7;
-        
-        System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 0 para salir");
+        System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 4 para Poisson 0 para salir");
         int montecarloOtro=sc.nextInt();
         while(montecarloOtro != 0){
             switch (montecarloOtro){
@@ -39,10 +38,50 @@ public class App {
                 case 3: 
                     recorridoBernoulli(semilla, m, exito);
                     break;
+                case 4: 
+                    recorridoPoisson(lambda, semilla, m);
+                    break;
             }
-            System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 0 para salir");
+            System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 4 para Poisson 0 para salir");
             montecarloOtro=sc.nextInt();
         }        
+    }
+
+    public static void recorridoPoisson(int lamda, int semilla, int m){
+        int pos=0;
+        outerloop:
+        for(int a= 1; a <=100; a++ ){
+            for(int c = 1; c <=100; c++){
+                    //Hacemos que se ejecute lo que tenemos en main (lo pasamos a una función)
+                    mixto(semilla, a, c, m);
+                if (pasa){   
+                    poisson(lamda, aleatorios[pos]);
+                    pasa=false;
+                    break outerloop;
+                }
+                incrementar = 0;
+            }
+        }
+    }
+
+    public static void poisson(int lamda, float numero){
+        System.out.println(numero);
+        float acumulado = 0, nuevo, anterior = 0;
+        outerloop:
+        for(int i=0; i < 32; i++ ){
+            nuevo = (float) (Math.pow(lamda, i) * Math.exp(-lamda))/factorial(i);
+            acumulado=nuevo+anterior;
+            if(numero > anterior && numero <= acumulado){
+                System.out.println("x:"+i);
+                break outerloop;
+            }
+            anterior=acumulado;
+        }
+    }
+    public static int factorial(int numero){
+        if(numero <= 1)
+            return 1;
+        return numero * factorial(numero - 1);
     }
 
     public static void monteCarloRecorrido(int semilla, int m){
