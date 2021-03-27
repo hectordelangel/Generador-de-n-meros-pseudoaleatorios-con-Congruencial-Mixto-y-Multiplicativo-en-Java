@@ -13,41 +13,44 @@ public class App {
     public static Stack <Float> pilaAleatorios = new Stack<Float>();
     public static Float[] numerosMuestra = new Float[muestra];
     public static Float[] aleatorios;
-    public static int incrementar = 0;
+    public static float[] llegadas;
+    public static int incrementar = 1;
     public static int limiteA,limiteB;
     public static boolean pasa = false;
         public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);    
         int semilla, m, a ,c;
-        int lambda=8;
+        int lambda=5;
         limiteA=1;
         limiteB=-1;
         semilla=94;
         m=32;
         float exito=(float)0.7;
-        System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 4 para Poisson 5 para Erlang 0 para salir");
-        int montecarloOtro=sc.nextInt();
-        while(montecarloOtro != 0){
-            switch (montecarloOtro){
-                case 1:
-                    monteCarloRecorrido(semilla, m);
-                    break;
-                case 2:
-                    recorridoExponencial(semilla, m, lambda);
-                    break;
-                case 3: 
-                    recorridoBernoulli(semilla, m, exito);
-                    break;
-                case 4: 
-                    recorridoPoisson(lambda, semilla, m);
-                    break;
-                case 5: 
-                    erlang(lambda, semilla, m);
-                    break;
-            }
-            System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 4 para Poisson 5 para Erlang 0 para salir");
-            montecarloOtro=sc.nextInt();
-        }        
+        // System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 4 para Poisson 5 para Erlang 0 para salir");
+        // int montecarloOtro=sc.nextInt();
+        // while(montecarloOtro != 0){
+        //     switch (montecarloOtro){
+        //         case 1:
+        //             monteCarloRecorrido(semilla, m);
+        //             break;
+        //         case 2:
+        //             recorridoExponencial(semilla, m, lambda);
+        //             break;
+        //         case 3: 
+        //             recorridoBernoulli(semilla, m, exito);
+        //             break;
+        //         case 4: 
+        //             recorridoPoisson(lambda, semilla, m);
+        //             break;
+        //         case 5: 
+        //             erlang(lambda, semilla, m);
+        //             break;
+        //     }
+        //     System.out.println("1 para montecarlo 2 para exponencial 3 para bernoulli 4 para Poisson 5 para Erlang 0 para salir");
+        //     montecarloOtro=sc.nextInt();
+        // }       
+        
+        recorridoExponencial(semilla, m, lambda);
     }
 
     public static void recorridoErlang(float lambda){
@@ -147,26 +150,70 @@ public class App {
     }
 
     public static void recorridoExponencial(int semilla, int m, float lambda){
-        int numero=1;
+        float exponencial=0;
+        float temp=0;
+        int contadorLlegadas=0;
+        int numPiezas=100;
+        float tempInspeccion = 0;
+        //llegadas -> tiempo entre llegadas
+        llegadas = new float[numPiezas];
+        Float [] tiempoLlegada = new Float[numPiezas];
+        Float [] inicioInspeccion = new Float[numPiezas];
+        Float [] tiempoInspeccion = new Float[numPiezas];
+        Float [] finInspeccion = new Float[numPiezas];
+        Float [] tiempoEnInspeccion = new Float[numPiezas];
+        Float [] tiempoEnEspera = new Float[numPiezas];
+        Float [] tiempoPromedioEnIspeccion = new Float[numPiezas];
         Scanner sc = new Scanner(System.in);   
         outerloop: 
         for(int a= 1; a <=100; a++ ){
             for(int c = 1; c <=100; c++){
                 mixto(semilla, a, c, m);
                 if (pasa){        
-                    while(incrementar<m && numero==1){
-                        System.out.println("1 para darle un número 0 para salir");
-                        numero=sc.nextInt();
-                        exponencial(lambda);
-                        if (numero==0){
-                            break outerloop;
-                        }
+                    while(incrementar<m){
+                            
+
+                                exponencial=(float)exponencial(lambda);
+                                llegadas[contadorLlegadas] = exponencial;
+                                tiempoLlegada[contadorLlegadas] = exponencial+temp;
+                                //tiempoInspeccion[contadorLlegadas]=Uniforme((float)4, (float)0.5);
+                                tiempoInspeccion[contadorLlegadas]=distNormal((float)4, (float)0.5);
+                                if(contadorLlegadas == 0){
+                                    inicioInspeccion [contadorLlegadas] = tiempoLlegada[contadorLlegadas];
+                                }
+                                else{
+                                    inicioInspeccion [contadorLlegadas] = Math.max(tiempoLlegada[contadorLlegadas], finInspeccion[contadorLlegadas-1]);
+                                }
+                                finInspeccion[contadorLlegadas]=inicioInspeccion[contadorLlegadas]+tiempoInspeccion[contadorLlegadas];
+                                tiempoEnInspeccion[contadorLlegadas]=finInspeccion[contadorLlegadas]-tiempoLlegada[contadorLlegadas];
+                                // tiempoEnEspera[contadorLlegadas]=inicioInspeccion[contadorLlegadas]-tiempoLlegada[contadorLlegadas];
+                                tiempoPromedioEnIspeccion[contadorLlegadas]=(tempInspeccion+tiempoEnInspeccion[contadorLlegadas])/(contadorLlegadas+1);
+                                tempInspeccion+=tiempoEnInspeccion[contadorLlegadas];
+                                System.out.println("tiempo: "+tiempoEnInspeccion[contadorLlegadas]);
+                                System.out.println("acum: "+tempInspeccion);
+                                temp+=exponencial;
+                                contadorLlegadas++;
+                                if(contadorLlegadas==numPiezas){
+                                    break outerloop;
+                                }
+                            
+                        
                     }
                     pasa=false;
                 }
                 incrementar = 0;
             }
         }
+
+        System.out.println("Todas");
+        for (int i=0;i<llegadas.length;i++){
+           System.out.println(llegadas[i]+" - "+tiempoLlegada[i]+" - "+inicioInspeccion[i]+" - "+tiempoInspeccion[i]+" - "+finInspeccion[i]+" - "+tiempoEnInspeccion[i]+" - "+tiempoPromedioEnIspeccion[i]);
+        }
+//
+        // System.out.println("Tiempo promedio en inspeccion");
+        // for (int i=0;i<llegadas.length;i++){
+        //    System.out.println(llegadas[i]);
+        // }
     }
     
     public static void recorridoBernoulli(int semilla, int m, float exito){
@@ -416,26 +463,23 @@ public class App {
         }   
     }
 
-    public static float Uniforme(int a, int b){
+    public static float Uniforme(float a, float b){
         float x=a+(b-a)*aleatorios[incrementar];
         incrementar++;
-        
-        // while(){
-        //     while(){
-                
-        //     }
-        // }
-        // for (;incrementar<x.length;){
-        //     //x = a+(b-a)*aleatorios[incrementar];
-        //     x[incrementar]=a+(b-a)*aleatorios[incrementar];
-        return x;
-        
+        return x;  
+    }
+
+    public static float distNormal(float media, float desvEstandar){
+        float distrNormal;
+        distrNormal = (aleatorios[incrementar] - 6) * desvEstandar + media;
+        incrementar++;
+        return  distrNormal;
     }
 
     public static int monteCarlo(){
         int dentro = 0;
         float x=0;
-        float y=0;
+        double y=0;
         float dardo=0;
         x=Uniforme(limiteA, limiteB);
         System.out.println("x: "+x);
@@ -450,12 +494,17 @@ public class App {
         //(detro/n)*4
     }
 
-    public static void exponencial(float lamda){
+    public static double exponencial(float lamda){
         double xi;
-        xi = -lamda * Math.log(1 - (double) aleatorios[incrementar]);
+        if(aleatorios[incrementar]!=0){
+            xi = -lamda * Math.log(1 - (double) aleatorios[incrementar]);
+            incrementar++;
+            return xi;
+        }
         incrementar++;
-        System.out.println(xi);
+        return xi = -lamda * Math.log(1 - (double) aleatorios[incrementar+1]);
     }
+
     //incrementarE = 0, incrementarB = 0
     public static void bernoulli(float exito){
         String cadena;
