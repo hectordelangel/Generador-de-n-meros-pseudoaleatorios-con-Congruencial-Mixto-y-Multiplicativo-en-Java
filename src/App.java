@@ -177,7 +177,7 @@ public class App {
                                 llegadas[contadorLlegadas] = exponencial;
                                 tiempoLlegada[contadorLlegadas] = exponencial+temp;
                                 //tiempoInspeccion[contadorLlegadas]=Uniforme((float)4, (float)0.5);
-                                tiempoInspeccion[contadorLlegadas]=distNormal((float)4, (float)0.5);
+                                tiempoInspeccion[contadorLlegadas]=(float)distNormal((float)4, (float)0.5);
                                 if(contadorLlegadas == 0){
                                     inicioInspeccion [contadorLlegadas] = tiempoLlegada[contadorLlegadas];
                                 }
@@ -186,11 +186,10 @@ public class App {
                                 }
                                 finInspeccion[contadorLlegadas]=inicioInspeccion[contadorLlegadas]+tiempoInspeccion[contadorLlegadas];
                                 tiempoEnInspeccion[contadorLlegadas]=finInspeccion[contadorLlegadas]-tiempoLlegada[contadorLlegadas];
-                                // tiempoEnEspera[contadorLlegadas]=inicioInspeccion[contadorLlegadas]-tiempoLlegada[contadorLlegadas];
+                                tiempoEnEspera[contadorLlegadas]=inicioInspeccion[contadorLlegadas]-tiempoLlegada[contadorLlegadas];
                                 tiempoPromedioEnIspeccion[contadorLlegadas]=(tempInspeccion+tiempoEnInspeccion[contadorLlegadas])/(contadorLlegadas+1);
                                 tempInspeccion+=tiempoEnInspeccion[contadorLlegadas];
-                                System.out.println("tiempo: "+tiempoEnInspeccion[contadorLlegadas]);
-                                System.out.println("acum: "+tempInspeccion);
+                                
                                 temp+=exponencial;
                                 contadorLlegadas++;
                                 if(contadorLlegadas==numPiezas){
@@ -207,7 +206,7 @@ public class App {
 
         System.out.println("Todas");
         for (int i=0;i<llegadas.length;i++){
-           System.out.println(llegadas[i]+" - "+tiempoLlegada[i]+" - "+inicioInspeccion[i]+" - "+tiempoInspeccion[i]+" - "+finInspeccion[i]+" - "+tiempoEnInspeccion[i]+" - "+tiempoPromedioEnIspeccion[i]);
+           System.out.println(llegadas[i]+" - "+tiempoLlegada[i]+" - "+inicioInspeccion[i]+" - "+tiempoInspeccion[i]+" - "+finInspeccion[i]+" - "+tiempoEnInspeccion[i]+" - "+tiempoEnEspera[i]+" - "+tiempoPromedioEnIspeccion[i]);
         }
 //
         // System.out.println("Tiempo promedio en inspeccion");
@@ -469,9 +468,14 @@ public class App {
         return x;  
     }
 
-    public static float distNormal(float media, float desvEstandar){
-        float distrNormal;
-        distrNormal = (aleatorios[incrementar] - 6) * desvEstandar + media;
+    public static double distNormal(float media, float desvEstandar){
+        double distrNormal;
+        float x=0;
+        float y=0;
+        x=Uniforme(0, 1);
+        y=Uniforme(0, 1);
+        distrNormal = Math.sqrt(-2*Math.log(x))*Math.cos(2*Math.PI*y);
+        distrNormal=distrNormal*desvEstandar+media;
         incrementar++;
         return  distrNormal;
     }
