@@ -14,6 +14,7 @@ public class App {
     public static Float[] numerosMuestra = new Float[muestra];
     public static Float[] aleatorios;
     public static float[] llegadas;
+    public static float[] llegadas2;
     public static int incrementar = 1;
     public static int limiteA,limiteB;
     public static boolean pasa = false;
@@ -50,8 +51,113 @@ public class App {
         //     montecarloOtro=sc.nextInt();
         // }       
         
-        recorridoExponencial(semilla, m, lambda);
+        recorridoExponencialParaDosServidores(semilla, m, lambda);
     }
+
+
+    //Dos servidores
+
+    public static void recorridoExponencialParaDosServidores(int semilla, int m, float lambda){
+        float exponencial=0;
+        float temp=0;
+        float temp2=0;
+        int contadorLlegadas=0;
+        int numPiezas=100;
+        float tempInspeccion = 0;
+        //llegadas -> tiempo entre llegadas
+        llegadas = new float[numPiezas];
+        llegadas2 = new float[numPiezas];
+        Float [] tiempoLlegada = new Float[numPiezas];
+        Float [] inicioInspeccion = new Float[numPiezas];
+        Float [] tiempoInspeccion = new Float[numPiezas];
+        Float [] finInspeccion = new Float[numPiezas];
+        Float [] tiempoEnInspeccion = new Float[numPiezas];
+        Float [] tiempoPromedioEnIspeccion = new Float[numPiezas];
+
+        Float [] tiempoLlegada2 = new Float[numPiezas];
+        Float [] inicioInspeccion2 = new Float[numPiezas];
+        Float [] tiempoInspeccion2 = new Float[numPiezas];
+        Float [] finInspeccion2 = new Float[numPiezas];
+        Float [] tiempoEnInspeccion2 = new Float[numPiezas];
+        Float [] tiempoPromedioEnIspeccion2 = new Float[numPiezas];
+        float tempInspeccion2 = 0;
+        float exponencial2=0;
+        Scanner sc = new Scanner(System.in);   
+        outerloop: 
+        for(int a= 1; a <=100; a++ ){
+            for(int c = 1; c <=100; c++){
+                mixto(semilla, a, c, m);
+                if (pasa){        
+                    while(incrementar<m){
+                        exponencial=(float)exponencial(lambda);
+                        llegadas[contadorLlegadas] = exponencial;
+                        tiempoLlegada[contadorLlegadas] = exponencial+temp;
+                        tiempoInspeccion[contadorLlegadas]=(float)distNormal((float)4, (float)0.5);
+                        if(contadorLlegadas==0){
+                            inicioInspeccion [contadorLlegadas] = tiempoLlegada[contadorLlegadas];
+                            
+                        }else{
+                            exponencial2=exponencial;
+                            tiempoLlegada2[contadorLlegadas] = exponencial2+temp2;
+                            tiempoInspeccion2[contadorLlegadas]=tiempoInspeccion[contadorLlegadas];
+                            inicioInspeccion [contadorLlegadas] = Math.max(tiempoLlegada[contadorLlegadas], finInspeccion[contadorLlegadas-1]);
+                            
+                            if(contadorLlegadas==1){
+                                llegadas2[contadorLlegadas-1] = exponencial;
+                                inicioInspeccion2 [contadorLlegadas] = tiempoLlegada2[contadorLlegadas];
+                            }else if(contadorLlegadas>1){
+                                llegadas2[contadorLlegadas-1] = exponencial;
+                                inicioInspeccion2 [contadorLlegadas] = Math.max(tiempoLlegada2[contadorLlegadas], finInspeccion2[contadorLlegadas-1]);
+                            }
+                            finInspeccion2[contadorLlegadas]=inicioInspeccion2[contadorLlegadas]+tiempoInspeccion2[contadorLlegadas];
+                            tiempoEnInspeccion2[contadorLlegadas]=finInspeccion2[contadorLlegadas]-tiempoLlegada2[contadorLlegadas];
+                            tiempoPromedioEnIspeccion2[contadorLlegadas]=(tempInspeccion2+tiempoEnInspeccion2[contadorLlegadas])/(contadorLlegadas+1);
+                            tempInspeccion2+=tiempoEnInspeccion2[contadorLlegadas];
+                        }
+
+
+                            finInspeccion[contadorLlegadas]=inicioInspeccion[contadorLlegadas]+tiempoInspeccion[contadorLlegadas];
+                            tiempoEnInspeccion[contadorLlegadas]=finInspeccion[contadorLlegadas]-tiempoLlegada[contadorLlegadas];
+                            tiempoPromedioEnIspeccion[contadorLlegadas]=(tempInspeccion+tiempoEnInspeccion[contadorLlegadas])/(contadorLlegadas+1);
+                            tempInspeccion+=tiempoEnInspeccion[contadorLlegadas];
+
+                            temp+=exponencial;
+                            temp2+=exponencial2;
+                            contadorLlegadas++;
+                            if(contadorLlegadas==numPiezas){
+                                break outerloop;
+                            }
+                    }
+                    pasa=false;
+                }
+                incrementar = 0;
+            }
+        }
+
+        // System.out.println("Todas");
+        // for (int i=0;i<llegadas.length;i++){
+        //    System.out.println(tiempoLlegada2[i]+" - "+inicioInspeccion2[i]+" - "+tiempoInspeccion2[i]+" - "+finInspeccion2[i]+" - "+tiempoEnInspeccion2[i]+" - "+tiempoPromedioEnIspeccion2[i]);
+        // }
+//
+        float prom=0;
+            for (int i=0;i<llegadas.length;i++){
+            prom+=tiempoPromedioEnIspeccion[i];
+            }
+        
+
+        float prom2=0;
+
+        for (int i=1;i<llegadas2.length;i++){
+            prom2+=tiempoPromedioEnIspeccion2[i];
+        }
+
+        prom=prom/llegadas.length;
+        prom2=prom2/llegadas.length;
+
+        System.out.println("Tiempo promedio en inspeccion cliente2: "+ (prom2+prom)/2);
+        
+    }
+
 
     public static void recorridoErlang(float lambda){
         float k = aleatorios.length;
@@ -149,7 +255,11 @@ public class App {
         System.out.println("Pi: "+pi);
     }
 
-    public static void recorridoExponencial(int semilla, int m, float lambda){
+
+    //Código Para Un servidor 
+
+    
+    public static void recorridoExponencialParaUnServidor(int semilla, int m, float lambda){
         float exponencial=0;
         float temp=0;
         int contadorLlegadas=0;
